@@ -1,0 +1,22 @@
+﻿@model Link
+
+<div style="width: 50%; margin: auto">
+    <h3>Edit</h3>
+    <form asp-action="Edit">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label asp-for="Title">Title</label>
+            <input required asp-for="Title" type="text" class="form-control" id="titleInput">
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="URL">URL</label>
+            <input asp-for="URL" type="url" class="form-control" id="urlInput">
+            <span asp-validation-for="URL" class="text-danger"></span>
+
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+</div>

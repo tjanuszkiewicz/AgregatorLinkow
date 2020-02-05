@@ -1,0 +1,83 @@
+﻿@model PagedResponse<Link>
+
+<div>
+    <table class="table table-borderless table-responsive">
+        <tbody>
+            @{
+                var iterator = Model.PageSize * (Model.PageIndex - 1) + 1;
+
+                @foreach (var l in Model)
+                {
+                    var points = "points";
+
+                    if (l.Points == 1)
+                    {
+                        points = "point";
+                    }
+                    <tr>
+                        @if (User.Identity.Name == l.User.UserName)
+                        {
+                            <td style="width: 10%">@iterator. <i title="You can't vote on your links." class="fas fa-ban" ></i> <small>@Html.DisplayFor(modelitem => l.Points) @points</small></td>
+                        }
+                        else if (l.Votes.FirstOrDefault(v => v.User.UserName == User.Identity.Name) is null)
+                        {
+                            <td style="width: 10%">
+                                @iterator.
+                                <a title="+1" asp-action="Vote" asp-route-linkId="@l.Id" asp-route-voteType="true">
+                                    <i class="far fa-thumbs-up"></i>
+                                </a> <small>@Html.DisplayFor(modelitem => l.Points) @points</small>
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="width: 10%">
+                                @iterator.
+                                <a title="-1" asp-action="Vote" asp-route-linkId="@l.Id" asp-route-voteType="false">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </a> <small>@Html.DisplayFor(modelitem => l.Points) @points</small>
+                            </td>
+                        }
+
+                        <td>
+                            <strong>@Html.DisplayFor(modelitem => l.Title)</strong>
+                        </td>
+                    </tr>
+                    <tr >
+                        <td style="padding-top: 0">
+                            @if (User.Identity.Name == l.User.UserName)
+                            {
+                                @Html.ActionLink("", "Delete", "Home", new { linkId = l.Id }, new { @class = "fas fa-trash pr-2 pl-2", title="Delete", onclick = "return confirm('Are you sure?')" })
+                                @Html.ActionLink("", "Edit", "Home", new { linkId = l.Id}, new { @class = "fas fa-pen pr-2 pl-2" , title="Edit" })
+
+                            }
+                        </td>
+                        <td style="padding-top: 0">
+                            <a target="_blank" href=@l.URL>@l.URL</a> |
+                            <small> added: @Html.DisplayFor(modelitem => l.UploadDate)</small>
+                        </td>
+
+                    </tr>
+                    iterator++;
+                }
+            }
+        </tbody>
+    </table>
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+    
+    @if(Model.TotalPages>0){
+    <a asp-action="Index"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       class="btn btn-outline-dark @prevDisabled">
+        Previous
+    </a>
+    <a asp-action="Index"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       class="btn btn-outline-dark @nextDisabled">
+        Next
+    </a>
+
+    }
+</div>

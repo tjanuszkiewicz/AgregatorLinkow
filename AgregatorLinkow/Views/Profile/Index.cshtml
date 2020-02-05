@@ -1,0 +1,79 @@
+﻿@model Link
+
+@{
+    var linkList = ViewData["linkList"] as PagedResponse<Link>;
+}
+
+<div>
+    <div style="width: 50%; margin: auto">
+        <h3>Add new link</h3>
+        <form asp-action="Create">
+            <div class="form-group">
+                <label asp-for="Title">Title</label>
+                <input required asp-for="Title" type="text" class="form-control" id="titleInput">
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="URL">URL</label>
+                <input asp-for="URL" type="url" class="form-control" id="urlInput">
+                <span asp-validation-for="URL" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-dark">Submit</button>
+        </form>
+    </div>
+
+    <h3>Your links</h3>
+    <table class="table border-dark table-borderless table-responsive">
+        <tbody>
+            @{
+                var iterator = linkList.PageSize * (linkList.PageIndex - 1) + 1;
+
+                @foreach (var l in linkList)
+                {
+                    var points = "points";
+
+                    if (l.Points == 1)
+                    {
+                        points = "point";
+                    }
+                    <tr>
+                        <td style="width: 10%">@iterator. <i title="You can't vote on your links." class="fas fa-ban"></i> <small>@Html.DisplayFor(modelitem => l.Points) @points</small></td>
+                        <td>
+                            <strong>@Html.DisplayFor(modelitem => l.Title)</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 0">
+                            @Html.ActionLink("", "Delete", "Home", new { linkId = l.Id}, new { @class = "fas fa-trash pr-3", title = "Delete", onclick = "return confirm('Are you sure?')" })
+                            @Html.ActionLink("", "Edit", "Home", new { linkId = l.Id }, new { @class = "fas fa-pen", title = "Edit" })
+                        </td>
+                        <td style="padding-top: 0">
+                            <a target="_blank" href=@l.URL>@l.URL</a> |
+                            <small> added: @Html.DisplayFor(modelitem => l.UploadDate)</small>
+                        </td>
+
+                    </tr>
+                    iterator++;
+                }
+            }
+        </tbody>
+    </table>
+    @{
+        var prevDisabled = !linkList.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !linkList.HasNextPage ? "disabled" : "";
+    }
+
+    @if (linkList.TotalPages > 0)
+    {
+        <a asp-action="Index"
+           asp-route-pageNumber="@(linkList.PageIndex - 1)"
+           class="btn btn-outline-dark @prevDisabled">
+            Previous
+        </a>
+        <a asp-action="Index"
+           asp-route-pageNumber="@(linkList.PageIndex + 1)"
+           class="btn btn-outline-dark @nextDisabled">
+            Next
+        </a>
+    }
+</div>
